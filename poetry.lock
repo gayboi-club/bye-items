@@ -338,14 +338,14 @@ all = ["flake8 (>=7.1.1)", "mypy (>=1.11.2)", "pytest (>=8.3.2)", "ruff (>=0.6.2
 
 [[package]]
 name = "kirkaio"
-version = "1.1.2"
+version = "1.1.4"
 description = "Async Python client for the Kirka Public API"
 optional = false
 python-versions = ">=3.11"
 groups = ["main"]
 files = [
-    {file = "kirkaio-1.1.2-py3-none-any.whl", hash = "sha256:6d25ffbc21d81a8261c7c448b7f9bf9c8484e66fc489fe4e58b9ceec7f2ca8f4"},
-    {file = "kirkaio-1.1.2.tar.gz", hash = "sha256:1cadeafba7497d80415031d057bffd4480c9a1d6c20b6f3a559826f129435625"},
+    {file = "kirkaio-1.1.4-py3-none-any.whl", hash = "sha256:6bc3a52e182ef0a89a5925408b5dc183f2547a031726d69cf5e472bd4b68b9d0"},
+    {file = "kirkaio-1.1.4.tar.gz", hash = "sha256:12eaf1f5793c6852b15d02be5dcb52feda17f22e38ea750c80c48e6b192fb094"},
 ]
 
 [package.dependencies]
@@ -859,4 +859,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13"
-content-hash = "1bbb1eb4b11f8d853ca6e971070b17b4cac4e9cbf81104e2e6860a583964e33c"
+content-hash = "f6d650366c72633ac50a752c190b26e7fb58c411078f5c8e81e9984da75060ea"
