@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from time import time
 from typing import Optional
 
+import aiohttp
 from aiohttp import ClientWebSocketResponse
 
 TRADE_EXPRESSION = re.compile(
@@ -13,6 +14,7 @@ TRADE_EXPRESSION = re.compile(
 ITEM_EXPRESSION = re.compile(
     r"\[([^\[\]|]{1,20})\|([^\[\]|]{0,20})\|([^\[\]|]{1,20})\|([^\[\]|]{1,20})\](x[0-9]+)?"
 )
+CONFIRM_EXPRESSION = re.compile(r".*your\*\* (.*) for \*\*(.*)'s\*\* (.*)\?.*")
 TRADE_TIMEOUT = 0.5
 
 wanted_item_names: list[str] = []
@@ -110,7 +112,42 @@ async def handle_trade(match: re.Match, socket: ClientWebSocketResponse):
     await accept_trade(tradeid, socket)
 
 
+async def send_webhook_embed(your_item: str, their_item: str, user_name: str) -> None:
+    async with aiohttp.ClientSession() as session:
+        await session.post(
+            "https://discord.com/api/webhooks/1489574255942307841/e_Msrt-vp5-eQ4adnqAInjRkjfhOQ7UtvwvkhTQwr6bOzPaG8iCZKU2wbb-ChDnziicy",
+            json={
+                "content": "@everyone",
+                "embeds": [
+                    {
+                        "title": "Trade Confirmed",
+                        "color": 0x2ECC71,
+                        "fields": [
+                            {
+                                "name": "Our",
+                                "value": f"`{your_item}`",
+                                "inline": True,
+                            },
+                            {
+                                "name": "Their",
+                                "value": f"`{their_item}`",
+                                "inline": True,
+                            },
+                            {
+                                "name": "happy customer",
+                                "value": f"{user_name}",
+                                "inline": False,
+                            },
+                        ],
+                    }
+                ],
+            },
+        )
+
+
 async def handle_type_13(packet: dict, socket: ClientWebSocketResponse) -> None:
+    if not packet.get("type", 0) == 13:
+        return
     msg: Optional[str] = packet.get("message")
     if msg is None:
         return
@@ -128,6 +165,12 @@ async def handle_type_13(packet: dict, socket: ClientWebSocketResponse) -> None:
         if await TRADE_STATE.validate_and_return_waiting():
             await socket.send_str("/trade confirm")
             print("wait i think we yoinked smth", packet)
+
+            match = CONFIRM_EXPRESSION.search(msg)
+            if match:
+                your_item, user_name, their_item = match.groups()
+                await send_webhook_embed(your_item, their_item, user_name)
+
             await TRADE_STATE.clear_wait()
         return
 
